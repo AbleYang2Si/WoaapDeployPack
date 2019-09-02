@@ -13,7 +13,6 @@ class LogController extends Controller
 
     public function search(Request $request)
     {
-        Log::notice(__METHOD__, $request->all());
         $keywords = $request->input('keywords');
         $date = $request->input('date', Carbon::now()->toDateString());
         if (empty($date)) {
@@ -33,7 +32,7 @@ class LogController extends Controller
             $command .= " | grep '" . $keyword . "'";
         }
 
-        $command .= ' | head -1000';
+        $command .= ' | tail -200';
 
         exec($command, $logs);
 
