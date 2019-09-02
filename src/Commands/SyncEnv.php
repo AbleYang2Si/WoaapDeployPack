@@ -39,17 +39,20 @@ class SyncEnv extends Command
      */
     public function handle()
     {
-        $url = 'http://127.0.0.1:8000/api/fetchConfContent';
+        $url = 'http://atest.woaap.com:9998/api/fetchConfContent';
 
         $params['app_name'] = config('app.name');
         $params['app_env'] = config('app.env');
         $params['timestamp'] = time();
         $params['sign'] = Hash::make(implode('', $params) . env('APP_SIGN_SALT'));
 
-        $client = new Client();
+        $client = new Client(['timeout' => 10]);
         $response = $client->request('get', $url, [
             'query' => $params
         ]);
+
+        if ($response->getStatusCode() != 200)
+            throw new \Exception('request fail!!!');
 
         $envContent = $response->getBody()->getContents();
         file_put_contents(base_path('.env'), $envContent);
