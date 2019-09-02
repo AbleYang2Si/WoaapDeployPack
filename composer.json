@@ -1,0 +1,28 @@
+{
+    "name": "woaap/deploy",
+    "description": "Laravel package",
+    "license": "MIT",
+    "type": "library",
+    "require": {
+        "php": ">=7.0",
+        "illuminate/support": "5.*",
+        "guzzlehttp/guzzle": "^6.3"
+    },
+    "author": {
+        "name": "able.yang",
+        "email": "able.yang@hotmail.com"
+    },
+    "autoload": {
+        "psr-4": {
+            "Woaap\\Deploy\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Woaap\\Deploy\\DeployServiceProvider"
+            ]
+        }
+    },
+    "minimum-stability": "dev"
+}
