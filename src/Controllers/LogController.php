@@ -6,13 +6,21 @@ use App\Http\Controllers\Controller;
 use GuzzleHttp\Client;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Hash;
 
 class LogController extends Controller
 {
 
     public function search(Request $request)
     {
+        //校验签名
+        $timestamp = $request->input('timestamp', 0);
+        if (abs($timestamp - time()) > 20)
+            abort(403, 'timestamp is fail');
+
+        if (!Hash::check(implode('', $request->only('keywords', 'date', 'timestamp')) . env('APP_SIGN_SALT'), $request->input('sign')))
+            abort(403, 'sign check fail');
+
         $keywords = $request->input('keywords');
         $date = $request->input('date', Carbon::now()->toDateString());
         if (empty($date)) {
