@@ -48,15 +48,17 @@ class LogController extends Controller
             return $logs;
         }
         // 获取其它节点数据
-        foreach (array_diff($services, [$local]) as $service) {
-            // 处理data数据
-            $url = 'http://' . $service . $request->getPathInfo();
-            $data = $this->httpGet($url, ($request->all() + ['isOutRawdata' => 1]));
+        if (count($services) > 1) {
+            foreach (array_diff($services, [$local]) as $service) {
+                // 处理data数据
+                $url = 'http://' . $service . $request->getPathInfo();
+                $data = $this->httpGet($url, ($request->all() + ['isOutRawdata' => 1]));
 
-            if (empty($data))
-                continue;
+                if (empty($data))
+                    continue;
 
-            $logs = array_merge($logs, $data);
+                $logs = array_merge($logs, $data);
+            }
         }
 
         $resultLogs = collect();
