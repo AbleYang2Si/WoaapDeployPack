@@ -39,7 +39,7 @@ class SyncEnv extends Command
      */
     public function handle()
     {
-        $url = 'http://atest.woaap.com:9998/api/fetchConfContent';
+        $url = 'https://deploy.woaap.com/api/fetchConfContent';
 
         $params['app_name'] = config('app.name');
         $params['app_env'] = config('app.env');
