@@ -51,7 +51,7 @@ class LogController extends Controller
         if (count($services) > 1) {
             foreach (array_diff($services, [$local]) as $service) {
                 // 处理data数据
-                $url = 'http://' . $service . $request->getPathInfo();
+                $url = 'http://' . $service . ':' . $request->server('SERVER_PORT') . $request->getPathInfo();
                 $data = $this->httpGet($url, ($request->all() + ['isOutRawdata' => 1]));
 
                 if (empty($data))
