@@ -45,23 +45,27 @@ class LogController extends Controller
 
         $command .= ' | tail -' . $limit;
 
-        if ($isOutRawdata) {
+        if ($services <= 1) {
             exec($command, $logs);
+        } else {
+            if ($isOutRawdata) {
+                exec($command, $logs);
 
-            return $logs;
-        }
+                return $logs;
+            }
 
-        $logs = [];
-        // 获取其它节点数据
-        foreach ($services as $service) {
-            // 处理data数据
-            $url = 'http://' . $service . ':' . $request->server('SERVER_PORT') . $request->getPathInfo();
-            $data = $this->httpGet($url, ($request->all() + ['isOutRawdata' => 1]));
+            $logs = [];
+            // 获取其它节点数据
+            foreach ($services as $service) {
+                // 处理data数据
+                $url = 'http://' . $service . ':' . $request->server('SERVER_PORT') . $request->getPathInfo();
+                $data = $this->httpGet($url, ($request->all() + ['isOutRawdata' => 1]));
 
-            if (empty($data))
-                continue;
+                if (empty($data))
+                    continue;
 
-            $logs = array_merge($logs, $data);
+                $logs = array_merge($logs, $data);
+            }
         }
 
         $resultLogs = collect();
