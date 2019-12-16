@@ -29,7 +29,7 @@ class LogController extends Controller
         $isOutRawdata = $request->input('isOutRawdata', false);
 
         $services = explode(',', env('APP_HA'));
-        $local = $request->server('SERVER_ADDR');
+//        $local = $request->server('SERVER_ADDR');
 
         // 获取本地日志
         $command = 'cat ' . storage_path('logs/laravel-' . $date . '.log');
@@ -40,7 +40,10 @@ class LogController extends Controller
             $command .= " | grep '" . $keyword . "'";
         }
 
-        $command .= ' | tail -200';
+        //通过ha节点数只能判断当前获取条数
+        $limit = count($services) ? ceil(200 / count($services)) : 200;
+
+        $command .= ' | tail -' . $limit;
 
         if ($isOutRawdata) {
             exec($command, $logs);
@@ -50,7 +53,7 @@ class LogController extends Controller
 
         $logs = [];
         // 获取其它节点数据
-        foreach (array_diff($services, [$local]) as $service) {
+        foreach ($services as $service) {
             // 处理data数据
             $url = 'http://' . $service . ':' . $request->server('SERVER_PORT') . $request->getPathInfo();
             $data = $this->httpGet($url, ($request->all() + ['isOutRawdata' => 1]));
