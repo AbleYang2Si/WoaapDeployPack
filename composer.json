@@ -6,7 +6,8 @@
     "require": {
         "php": ">=7.0",
         "illuminate/support": "5.*",
-        "guzzlehttp/guzzle": "^6.3"
+        "guzzlehttp/guzzle": "^6.3",
+        "linfo/linfo": "^4.0"
     },
     "author": {
         "name": "able.yang",
