@@ -119,6 +119,9 @@ class LogController extends Controller
 
         $resultContent = $process->getOutput();
 
+        $process->clearOutput();
+        $process->clearErrorOutput();
+
         return explode(PHP_EOL, $resultContent);
     }
 }
