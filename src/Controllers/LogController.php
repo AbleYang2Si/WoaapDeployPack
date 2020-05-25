@@ -7,6 +7,8 @@ use GuzzleHttp\Client;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Hash;
+use Symfony\Component\Process\Exception\ProcessFailedException;
+use Symfony\Component\Process\Process;
 
 class LogController extends Controller
 {
@@ -46,10 +48,10 @@ class LogController extends Controller
         $command .= ' | tail -' . $limit;
 
         if ($services <= 1) {
-            exec($command, $logs);
+            $logs = self::commandRun($command);
         } else {
             if ($isOutRawdata) {
-                exec($command, $logs);
+                $logs = self::commandRun($command);
 
                 return $logs;
             }
@@ -104,5 +106,19 @@ class LogController extends Controller
 
         $envContent = $response->getBody()->getContents();
         return json_decode($envContent, true);
+    }
+
+    public static function commandRun($command)
+    {
+        $process = new Process($command);
+        $process->run();
+
+        if (!$process->isSuccessful()) {
+            throw new ProcessFailedException($process);
+        }
+
+        $resultContent = $process->getOutput();
+
+        return explode(PHP_EOL, $resultContent);
     }
 }
