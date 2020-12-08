@@ -95,7 +95,7 @@ class LogController extends Controller
 
     public function httpGet($url, $params)
     {
-        $client = new Client(['timeout' => 10]);
+        $client = new Client(['timeout' => 10, 'verify' => false]);
 
         $response = $client->request('get', $url, [
             'query' => $params

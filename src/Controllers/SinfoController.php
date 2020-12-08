@@ -49,7 +49,7 @@ class SinfoController extends Controller
 
     public function httpGet($url, $params)
     {
-        $client = new Client(['timeout' => 3]);
+        $client = new Client(['timeout' => 3, 'verify' => false]);
 
         $response = $client->request('get', $url, [
             'query' => $params
