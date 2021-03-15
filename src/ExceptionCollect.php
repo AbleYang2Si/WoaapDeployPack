@@ -2,66 +2,41 @@
 
 namespace Woaap\Deploy;
 
-use Illuminate\Support\Facades\Redis;
-
+use GuzzleHttp\Client;
 class ExceptionCollect
 {
-
-    private $date_time = '';
-    private $minutes = 0;
-
-    public function __construct()
-    {
-        $this->setDateTime();
-        $this->setMinutes();
-    }
+    const DEPLOY_URL = 'http://deploy.woaap.com';
 
     /**
-     * 异常收集
+     * Notes: 异常收集
+     * User: mark.gao
+     * Date: 2021/3/15 13:43
      * @param $html
+     * @return bool|mixed
      */
     public function collect($html)
     {
-        config([
-            'database.redis.deploy-connection' => [
-                'host' => '10.22.21.69',
-                'password' => null,
-                'port' => '6379',
-                'database' => 1
-            ]
+        $params = [
+            'app_name' => config('app.name'),
+            'app_env' => config('app.env'),
+            'app_sign' => env('APP_SIGN_SALT'),
+            'html_content' => $html
+        ];
+        return $this->httpPost($params);
+    }
+
+    public function httpPost($params)
+    {
+        $client = new Client(['timeout' => 10, 'verify' => false]);
+
+        $response = $client->request('post', self::DEPLOY_URL . '/exception/collect', [
+            'http_errors' => false,
+            'json' => $params
         ]);
-        $redis = Redis::connection('deploy-connection');
-        $redis_key = config('app.name') . '_' . config('app.env') . ':' . $this->getRedisKey() ;
-        $redis->hset($redis_key, $this->date_time . uniqid(), $html);
-    }
+        if ($response->getStatusCode() != 200)
+            return false;
 
-    /**
-     * 获取当前时间
-     */
-    private function setDateTime()
-    {
-        $this->date_time = time();
+        $envContent = $response->getBody()->getContents();
+        return json_decode($envContent, true);
     }
-
-    /**
-     * 获取当前分钟
-     */
-    private function setMinutes()
-    {
-        $this->minutes = (int)date('i', $this->date_time);
-    }
-
-    /**
-     * 计算redis key
-     * @return false|string
-     */
-    private function getRedisKey()
-    {
-        $mod = (int)$this->minutes % 10;
-        if($mod === 0){
-            return date('YmdHi', $this->date_time);
-        }
-        return date('YmdH', $this->date_time) . ($this->minutes - $mod);
-    }
-
 }
