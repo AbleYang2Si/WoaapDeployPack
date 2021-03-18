@@ -27,12 +27,17 @@ class ExceptionCollect
 
     public function httpPost($params)
     {
-        $client = new Client(['timeout' => 10, 'verify' => false]);
+        try{
+            $client = new Client(['timeout' => 10, 'verify' => false]);
 
-        $response = $client->request('post', self::DEPLOY_URL . '/exception/collect', [
-            'http_errors' => false,
-            'json' => $params
-        ]);
+            $response = $client->request('post', self::DEPLOY_URL . '/exception/collect', [
+                'http_errors' => false,
+                'json' => $params
+            ]);
+        }catch (\Exception $exception){
+            return false;
+        }
+
         if ($response->getStatusCode() != 200)
             return false;
 
